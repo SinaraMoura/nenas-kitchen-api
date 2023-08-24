@@ -16,7 +16,7 @@ class App {
         connect();
     }
     private initializeRoutes() {
-        this.app.use('/recipe', this.recipeRoutes.router);
+        this.app.use('/recipes', this.recipeRoutes.router);
     }
     private interceptionError() {
         this.app.use(errorMiddleware);
