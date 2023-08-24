@@ -25,5 +25,16 @@ class RecipeUseCase {
         return result;
     }
 
+    async findAllRecipes() {
+        const result = await this.recipeRepository.findAllRecipe();
+        return result;
+    }
+
+    async findRecipesById(id: string) {
+        if (!id) throw new HttpException(400, 'Id is required');
+        const result = await this.recipeRepository.findRecipesById(id);
+        return result;
+    }
+
 }
 export { RecipeUseCase }

@@ -17,6 +17,14 @@ class RecipeRouter {
         this.router.post(
             '/',
             this.recipeController.create.bind(this.recipeController)
+        );
+        this.router.get(
+            '/',
+            this.recipeController.findAllRecipes.bind(this.recipeController)
+        );
+        this.router.get(
+            '/:id',
+            this.recipeController.findRecipesById.bind(this.recipeController)
         )
     }
 }

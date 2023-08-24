@@ -23,11 +23,20 @@ const RecipeModel = mongoose.model('Recipe', recipeSchema);
 
 class RecipeRepositoryMongoose implements RecipeRepository {
     async addRecipe(recipe: Recipe): Promise<Recipe> {
-
         const recipeModel = new RecipeModel(recipe);
 
         await recipeModel.save();
         return recipe;
+    }
+
+    async findAllRecipe(): Promise<Recipe[]> {
+        const findRecipe = await RecipeModel.find().exec();
+        return findRecipe.map((recipe) => recipe.toObject());
+    }
+
+    async findRecipesById(id: string): Promise<Recipe | undefined> {
+        const findRecipe = await RecipeModel.findById({ _id: id }).exec();
+        return findRecipe ? findRecipe.toObject() : undefined
     }
 
 }

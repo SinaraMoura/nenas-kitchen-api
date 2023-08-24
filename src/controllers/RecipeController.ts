@@ -14,5 +14,24 @@ class RecipeController {
             next(error)
         }
     }
+
+    async findAllRecipes(req: Request, res: Response, next: NextFunction) {
+        try {
+            const recipes = await this.recipeUseCase.findAllRecipes();
+            return res.status(200).json(recipes)
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async findRecipesById(req: Request, res: Response, next: NextFunction) {
+        const { id } = req.params;
+        try {
+            const recipe = await this.recipeUseCase.findRecipesById(String(id));
+            return res.status(200).json(recipe);
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 export { RecipeController }
