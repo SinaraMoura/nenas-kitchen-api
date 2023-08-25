@@ -63,5 +63,26 @@ class RecipeController {
             next(error)
         }
     }
+
+    async updateRecipes(req: Request, res: Response, next: NextFunction) {
+        const { title, preparation } = req.body;
+        const { id } = req.params;
+        try {
+            const recipe = await this.recipeUseCase.updateRecipes(id, title, preparation);
+            return res.status(200).json(recipe);
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async deleteRecipes(req: Request, res: Response, next: NextFunction) {
+        const { id } = req.params;
+        try {
+            const recipe = await this.recipeUseCase.deleteRecipes(id);
+            return res.status(200).json(recipe);
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 export { RecipeController }

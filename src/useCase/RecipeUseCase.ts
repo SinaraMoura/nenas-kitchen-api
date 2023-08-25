@@ -54,5 +54,21 @@ class RecipeUseCase {
         return result;
     }
 
+    async updateRecipes(id: string, title: string, preparation: string[]) {
+        const recipe = await this.recipeRepository.findRecipesById(id);
+        if (!recipe) throw new HttpException(400, 'Recipe not found');
+
+        const result = await this.recipeRepository.updateRecipes(title, preparation);
+        return result;
+    }
+
+    async deleteRecipes(id: string) {
+        const recipe = await this.recipeRepository.findRecipesById(id);
+        if (!recipe) throw new HttpException(400, 'Recipe not found');
+
+        const result = await this.recipeRepository.deleteRecipes(id);
+        return result;
+    }
+
 }
 export { RecipeUseCase }

@@ -38,6 +38,14 @@ class RecipeRouter {
             '/difficulty',
             this.recipeController.findRecipesByDifficulty.bind(this.recipeController)
         )
+        this.router.put(
+            '/update/:id',
+            this.recipeController.updateRecipes.bind(this.recipeController)
+        )
+        this.router.delete(
+            '/delete/:id',
+            this.recipeController.deleteRecipes.bind(this.recipeController)
+        )
     }
 }
 

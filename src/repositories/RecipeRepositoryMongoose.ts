@@ -64,6 +64,16 @@ class RecipeRepositoryMongoose implements RecipeRepository {
         return findRecipe.map((recipe) => recipe.toObject());
     }
 
+    async updateRecipes(title: string, preparation: string[]): Promise<any> {
+        const updateRecipe = await RecipeModel.updateOne({ title, preparation }).exec();
+        return updateRecipe;
+    }
+
+    async deleteRecipes(id: string): Promise<any> {
+        const deleteRecipe = await RecipeModel.deleteOne({ _id: id }).exec();
+        return deleteRecipe;
+    }
+
 }
 export { RecipeRepositoryMongoose };
 
