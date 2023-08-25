@@ -2,7 +2,6 @@ import axios from 'axios';
 import { Recipe } from '../entities/Recipe';
 import { HttpException } from '../interfaces/HttpException';
 import { RecipeRepository } from '../repositories/RecipeRepositoty';
-import { RecipeRepositoryMongoose } from '../repositories/RecipeRepositoryMongoose';
 
 class RecipeUseCase {
     constructor(private recipeRepository: RecipeRepository) { }
@@ -16,6 +15,9 @@ class RecipeUseCase {
         }
         if (!recipeData.ingredients) {
             throw new HttpException(400, 'Ingredients is required');
+        }
+        if (!recipeData.category) {
+            throw new HttpException(400, 'Category is required');
         }
 
         recipeData = {

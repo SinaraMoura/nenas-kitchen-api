@@ -9,7 +9,7 @@ class RecipeController {
         let recipeData: Recipe = req.body;
         try {
             await this.recipeUseCase.create(recipeData);
-            return res.status(201).json({ message: "Receita adicionada com sucesso" })
+            return res.status(201).json({ message: "Receita adicionada com sucesso." })
         } catch (error) {
             next(error)
         }
@@ -69,7 +69,7 @@ class RecipeController {
         const { id } = req.params;
         try {
             const recipe = await this.recipeUseCase.updateRecipes(id, title, preparation);
-            return res.status(200).json(recipe);
+            return res.status(204).json(recipe);
         } catch (error) {
             next(error)
         }
