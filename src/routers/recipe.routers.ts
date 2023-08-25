@@ -30,6 +30,14 @@ class RecipeRouter {
             '/category/:category',
             this.recipeController.findRecipesByCategory.bind(this.recipeController)
         )
+        this.router.get(
+            '/title',
+            this.recipeController.findRecipesByName.bind(this.recipeController)
+        )
+        this.router.get(
+            '/difficulty',
+            this.recipeController.findRecipesByDifficulty.bind(this.recipeController)
+        )
     }
 }
 

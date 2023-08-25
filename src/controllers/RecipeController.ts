@@ -43,5 +43,25 @@ class RecipeController {
             next(error)
         }
     }
+
+    async findRecipesByName(req: Request, res: Response, next: NextFunction) {
+        const { name } = req.query;
+        try {
+            const recipe = await this.recipeUseCase.findRecipesByName(String(name));
+            return res.status(200).json(recipe);
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async findRecipesByDifficulty(req: Request, res: Response, next: NextFunction) {
+        const { name } = req.query;
+        try {
+            const recipe = await this.recipeUseCase.findRecipesByDifficylty(String(name));
+            return res.status(200).json(recipe);
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 export { RecipeController }

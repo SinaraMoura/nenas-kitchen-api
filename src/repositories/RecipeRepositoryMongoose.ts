@@ -45,6 +45,25 @@ class RecipeRepositoryMongoose implements RecipeRepository {
         return findRecipe.map((recipe) => recipe.toObject());
     }
 
+    async findRecipesByName(name: string): Promise<Recipe[]> {
+        const findRecipe = await RecipeModel.find({
+            title: {
+                $regex: name,
+                $options: 'i'
+            }
+        }).exec();
+        return findRecipe.map((recipe) => recipe.toObject());
+    }
+    async findRecipesByDifficulty(name: string): Promise<Recipe[]> {
+        const findRecipe = await RecipeModel.find({
+            difficulty: {
+                $regex: name,
+                $options: 'i'
+            }
+        }).exec();
+        return findRecipe.map((recipe) => recipe.toObject());
+    }
+
 }
 export { RecipeRepositoryMongoose };
 

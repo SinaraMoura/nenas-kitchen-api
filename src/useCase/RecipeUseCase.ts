@@ -42,5 +42,17 @@ class RecipeUseCase {
         return result;
     }
 
+    async findRecipesByName(name: string) {
+        if (!name) throw new HttpException(400, 'Name is required');
+        const result = await this.recipeRepository.findRecipesByName(name);
+        return result;
+    }
+
+    async findRecipesByDifficylty(name: string) {
+        if (!name) throw new HttpException(400, 'Name is required');
+        const result = await this.recipeRepository.findRecipesByDifficulty(name);
+        return result;
+    }
+
 }
 export { RecipeUseCase }

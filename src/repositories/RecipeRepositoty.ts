@@ -5,4 +5,6 @@ export interface RecipeRepository {
     findAllRecipe(): Promise<Recipe[]>
     findRecipesById(id: string): Promise<Recipe | undefined>
     findRecipesByCategory(category: string): Promise<Recipe[]>
+    findRecipesByName(name: string): Promise<Recipe[]>
+    findRecipesByDifficulty(name: string): Promise<Recipe[]>
 }
