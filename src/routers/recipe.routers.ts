@@ -19,12 +19,16 @@ class RecipeRouter {
             this.recipeController.create.bind(this.recipeController)
         );
         this.router.get(
-            '/',
+            '/list',
             this.recipeController.findAllRecipes.bind(this.recipeController)
         );
         this.router.get(
-            '/:id',
+            '/id/:id',
             this.recipeController.findRecipesById.bind(this.recipeController)
+        )
+        this.router.get(
+            '/category/:category',
+            this.recipeController.findRecipesByCategory.bind(this.recipeController)
         )
     }
 }

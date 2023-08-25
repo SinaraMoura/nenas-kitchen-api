@@ -3,10 +3,10 @@ class Recipe {
         public title: string,
         public ingredients: string[],
         public duration: string,
-        public preparation: string,
+        public preparation: string[],
         public difficulty: string,
-        public date: Date
-
+        public date: Date,
+        public categiry: string
     ) { }
 }
 

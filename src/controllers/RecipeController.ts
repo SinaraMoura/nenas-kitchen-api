@@ -33,5 +33,15 @@ class RecipeController {
             next(error)
         }
     }
+
+    async findRecipesByCategory(req: Request, res: Response, next: NextFunction) {
+        const { category } = req.params;
+        try {
+            const recipe = await this.recipeUseCase.findRecipesByCategory(category);
+            return res.status(200).json(recipe);
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 export { RecipeController }

@@ -36,5 +36,11 @@ class RecipeUseCase {
         return result;
     }
 
+    async findRecipesByCategory(category: string) {
+        if (!category) throw new HttpException(400, 'Category is required');
+        const result = await this.recipeRepository.findRecipesByCategory(category);
+        return result;
+    }
+
 }
 export { RecipeUseCase }

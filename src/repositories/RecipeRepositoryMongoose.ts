@@ -10,9 +10,10 @@ const recipeSchema = new mongoose.Schema({
     title: String,
     ingredients: [String],
     duration: String,
-    preparation: String,
+    preparation: [String],
     difficulty: String,
     date: Date,
+    category: String,
     createdAt: {
         type: Date,
         default: Date.now,
@@ -37,6 +38,11 @@ class RecipeRepositoryMongoose implements RecipeRepository {
     async findRecipesById(id: string): Promise<Recipe | undefined> {
         const findRecipe = await RecipeModel.findById({ _id: id }).exec();
         return findRecipe ? findRecipe.toObject() : undefined
+    }
+
+    async findRecipesByCategory(category: string): Promise<Recipe[]> {
+        const findRecipe = await RecipeModel.find({ category }).exec();
+        return findRecipe.map((recipe) => recipe.toObject());
     }
 
 }
