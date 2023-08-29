@@ -3,6 +3,7 @@ import { HttpException } from '../interfaces/HttpException';
 import { ArticleRepository } from '../repositories/ArticleRepositoty';
 
 class ArticleUseCase {
+
     constructor(private articleRepository: ArticleRepository) { }
 
     async create(articleData: Article) {
@@ -14,6 +15,11 @@ class ArticleUseCase {
         }
 
         const result = await this.articleRepository.addArticle(articleData);
+        return result;
+    }
+
+    async findAllArticles() {
+        const result = await this.articleRepository.findAllArticle();
         return result;
     }
 }

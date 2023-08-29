@@ -16,14 +16,18 @@ const articleSchema = new mongoose.Schema({
     },
 });
 
-const RecipeModel = mongoose.model('Articles', articleSchema);
+const ArticleModel = mongoose.model('Articles', articleSchema);
 
 class ArticleRepositoryMongoose implements ArticleRepository {
     async addArticle(article: Article): Promise<Article> {
-        const recipeModel = new RecipeModel(article);
+        const articleModel = new ArticleModel(article);
 
-        await recipeModel.save();
+        await articleModel.save();
         return article;
+    }
+    async findAllArticle(): Promise<Article[]> {
+        const findArticle = await ArticleModel.find().exec();
+        return findArticle.map((article) => article.toObject());
     }
 }
 export { ArticleRepositoryMongoose };

@@ -18,6 +18,10 @@ class ArticleRouter {
             '/',
             this.articleController.create.bind(this.articleController)
         );
+        this.router.get(
+            '/list',
+            this.articleController.findAllArticles.bind(this.articleController)
+        );
     }
 }
 

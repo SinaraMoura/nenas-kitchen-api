@@ -16,5 +16,14 @@ class ArticleController {
             next(error)
         }
     }
+
+    async findAllArticles(req: Request, res: Response, next: NextFunction) {
+        try {
+            const articles = await this.articleUseCase.findAllArticles();
+            return res.status(200).json(articles)
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 export { ArticleController }
