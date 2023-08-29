@@ -4,10 +4,11 @@ import path from 'node:path';
 import { connect } from './infra/database';
 import { errorMiddleware } from './middlewares/error.middlewares';
 import { RecipeRouter } from './routers/recipe.routers';
-
+import { ArticleRouter } from './routers/article.routers';
 class App {
     public app: Application;
     private recipeRoutes = new RecipeRouter();
+    private articleRoutes = new ArticleRouter();
     constructor() {
         this.app = express();
         this.middlewaresInitialize();
@@ -17,6 +18,7 @@ class App {
     }
     private initializeRoutes() {
         this.app.use('/recipes', this.recipeRoutes.router);
+        this.app.use('/articles', this.articleRoutes.router);
     }
     private interceptionError() {
         this.app.use(errorMiddleware);

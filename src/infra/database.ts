@@ -1,8 +1,8 @@
-import mongoose from 'mongoose';
+import mongoose, { ConnectOptions } from 'mongoose';
 
 export async function connect() {
     try {
-        await mongoose.connect('mongodb+srv://nenaskitchen:OYVmSu4cp2kuGnaB@cluster0.agncpdt.mongodb.net/nenaskitchen');
+        await mongoose.connect('mongodb+srv://nenaskitchen:OYVmSu4cp2kuGnaB@cluster0.agncpdt.mongodb.net/nenaskitchen', { useNewUrlParser: true } as ConnectOptions);
         console.log('Database connect success');
 
     } catch (error) {

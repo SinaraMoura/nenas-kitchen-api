@@ -6,7 +6,8 @@ class Recipe {
         public preparation: string[],
         public difficulty: string,
         public date: Date,
-        public category: string
+        public category: string,
+        public image: string
     ) { }
 }
 

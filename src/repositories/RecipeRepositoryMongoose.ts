@@ -14,6 +14,7 @@ const recipeSchema = new mongoose.Schema({
     difficulty: String,
     date: Date,
     category: String,
+    image: String,
     createdAt: {
         type: Date,
         default: Date.now,

@@ -7,6 +7,19 @@ class RecipeController {
 
     async create(req: Request, res: Response, next: NextFunction) {
         let recipeData: Recipe = req.body;
+        const files = req.files as any;
+
+        if (files) {
+            const image = files.image[0];
+
+
+            recipeData = {
+                ...recipeData,
+                image: image.filename
+            };
+            console.log("🚀 ~ file: RecipeController.ts:17 ~ RecipeController ~ create ~ recipeData:", recipeData)
+
+        }
         try {
             await this.recipeUseCase.create(recipeData);
             return res.status(201).json({ message: "Receita adicionada com sucesso." })

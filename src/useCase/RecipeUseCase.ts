@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { Recipe } from '../entities/Recipe';
 import { HttpException } from '../interfaces/HttpException';
 import { RecipeRepository } from '../repositories/RecipeRepositoty';
@@ -19,10 +18,10 @@ class RecipeUseCase {
         if (!recipeData.category) {
             throw new HttpException(400, 'Category is required');
         }
-
-        recipeData = {
-            ...recipeData
+        if (!recipeData.image) {
+            throw new HttpException(400, 'Image is required');
         }
+
         const result = await this.recipeRepository.addRecipe(recipeData);
         return result;
     }
