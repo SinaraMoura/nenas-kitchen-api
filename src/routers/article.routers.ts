@@ -2,6 +2,7 @@ import { Router } from "express";
 import { ArticleController } from "../controllers/ArticleController";
 import { ArticleRepositoryMongoose } from "../repositories/ArticleRepositoryMongoose";
 import { ArticleUseCase } from "../useCase/ArticleUseCase"
+import { upload } from "../infra/multer";
 
 class ArticleRouter {
     public router: Router;
@@ -14,6 +15,17 @@ class ArticleRouter {
         this.initRoutes();
     }
     initRoutes() {
+        this.router.post(
+            '/',
+            upload.fields([
+                {
+                    name: 'image',
+                    maxCount: 1,
+                },
+
+            ]),
+            this.articleController.create.bind(this.articleController),
+        );
         this.router.post(
             '/',
             this.articleController.create.bind(this.articleController)

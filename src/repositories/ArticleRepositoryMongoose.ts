@@ -10,6 +10,7 @@ const articleSchema = new mongoose.Schema({
     title: String,
     description: String,
     text: [String],
+    image: String,
     createdAt: {
         type: Date,
         default: Date.now,

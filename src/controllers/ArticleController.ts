@@ -7,6 +7,17 @@ class ArticleController {
 
     async create(req: Request, res: Response, next: NextFunction) {
         let articleData: Article = req.body;
+        const files = req.files as any;
+
+        if (files) {
+            const image = files.image[0];
+
+
+            articleData = {
+                ...articleData,
+                image: image.filename
+            };
+        }
 
         try {
             await this.articleUseCase.create(articleData);
