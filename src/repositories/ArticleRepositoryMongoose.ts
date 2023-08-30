@@ -30,6 +30,11 @@ class ArticleRepositoryMongoose implements ArticleRepository {
         const findArticle = await ArticleModel.find().exec();
         return findArticle.map((article) => article.toObject());
     }
+
+    async findArticlesById(id: string): Promise<Article | undefined> {
+        const findArticle = await ArticleModel.findById({ _id: id }).exec();
+        return findArticle ? findArticle.toObject() : undefined
+    }
 }
 export { ArticleRepositoryMongoose };
 

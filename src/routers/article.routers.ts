@@ -34,6 +34,10 @@ class ArticleRouter {
             '/list',
             this.articleController.findAllArticles.bind(this.articleController)
         );
+        this.router.get(
+            '/id/:id',
+            this.articleController.findArticlesById.bind(this.articleController)
+        );
     }
 }
 

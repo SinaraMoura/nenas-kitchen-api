@@ -22,5 +22,11 @@ class ArticleUseCase {
         const result = await this.articleRepository.findAllArticle();
         return result;
     }
+
+    async findArticlesById(id: string) {
+        if (!id) throw new HttpException(400, 'Id is required');
+        const result = await this.articleRepository.findArticlesById(id);
+        return result;
+    }
 }
 export { ArticleUseCase }
