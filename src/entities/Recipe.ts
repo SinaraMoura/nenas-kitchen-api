@@ -2,6 +2,7 @@ class Recipe {
     constructor(
         public title: string,
         public ingredients: string[],
+        public proceeds: string,
         public duration: string,
         public preparation: string[],
         public difficulty: string,

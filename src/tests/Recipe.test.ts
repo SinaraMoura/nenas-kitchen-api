@@ -51,39 +51,47 @@ describe('Recipes test', () => {
     // });
     it('/POST ', async () => {
         const recipe = {
-            title: 'Pernil Assado Com Hellmanns',
-            duration: '300 minutos',
+            title: 'Carne de Panela de Lagarto',
+            duration: '60 minutos',
+            proceeds: '8 pessoas',
             difficulty: 'Médio',
             category: 'Carnes',
             date: new Date(),
             ingredients: [
-                "1 pernil suíno sem osso cerca de 3 kg",
-                "1 colher de chá de sal",
-                "2 xícaras de chá de vinho branco seco",
-                "3 colheres de sopa de azeite",
-                "4 dentes de alho picado",
-                "2 folhas de louro seco",
-                "2 ramos de alecrim fresco",
-                "1 xícara de chá de Maionese Hellmann's"
+                "3 Colher(es) de sopa de azeite de oliva",
+                "1 Quilo(s) de lagarto em peça",
+                "2 Cubo(s) de Caldo Knorr Carne",
+                "2 Xícara(s) de água fervoroso",
+                "5 Colher(es) de sopa de extrato de tomate",
+                "1 cenoura cenoura grande fatiada eme montarias",
+                "1 batata grande cortado em cubos",
+                "1 colher de sopa de Amido de Milho Maizena",
+                "1 Colher(es) de sopa de água",
             ],
             preparation: [
-                "Pré-aqueça o forno em temperatura média (200°C).",
-                "Em uma assadeira grande, coloque o pernil e, com o auxílio de um garfo, faça furos pela superfície.",
-                "Polvilhe o sal, regue com o vinho branco e o azeite, e disponha na superfície o alho, as folhas de louro e o alecrim. Cubra e deixe tomar gosto na geladeira, por no mínimo 3 horas, virando-o na metade do tempo.",
-                "Retire da geladeira, passe a maionese HELLMANNS por todo o pernil, cubra com papel-alumínio e leve ao forno, por 1 hora e 30 minutos. Remova o papel-alumínio e volte ao forno por mais 1 hora, ou até dourar a superfície e a carne estar assada por dentro.",
-                "Retire o pernil do forno, fatie-o, disponha em uma travessa e sirva."
+                " Em uma panela de pressão, aqueça o azeite em fogo alto e frite a carne dourando de todos os lados.",
+                "Dissolva os cubos de Caldo Knorr Carne na água fervente e acrescente à carne.",
+                "Junte o extrato de tomate, tampe a panela, e cozinhe em fogo médio por 40 minutos, contados a partir do início da pressão.",
+                "Retire do fogo e aguarde sair todo o vapor, abra a panela junte a cenoura e a batata.",
+                "Cozinhe, com a panela destampada, por 10 minutos ou até as batatas e a cenoura ficarem macias.",
+                "Retire a carne, fatie e coloque em uma travessa.",
+                "Disponha os legumes em volta da carne.",
+                "Dissolva o amido de milho MAIZENA® na água e junte ao caldo.",
+                "Cozinhe em fogo médio mexendo sempre até formar um molho cremoso.",
+                "Despeje o molho sobre a carne e sirva em seguida."
             ]
         }
         const response = await request(express)
             .post('/recipes')
             .field('title', recipe.title)
             .field('duration', recipe.duration)
+            .field('proceeds', recipe.proceeds)
             .field('difficulty', recipe.difficulty)
             .field('category', recipe.category)
             .field('date', recipe.date.toISOString())
             .field('ingredients', recipe.ingredients)
             .field('preparation', recipe.preparation)
-            .attach('image', '/Users/Sinara/Downloads/pernil-assado.avif')
+            .attach('image', '/Users/Sinara/Downloads/carne-de-panela.avif')
 
         if (response.error) {
             console.log("🚀 ~ file: Recipe.test.ts:81 ~ it ~ response.error:", response.error)
@@ -193,6 +201,7 @@ const recipeUseCase = new RecipeUseCase(recipeRepository)
 const recipe: Recipe = {
     title: 'Pernil Assado Com Hellmann’s',
     duration: '300 minutos',
+    proceeds: '10 pessoas',
     difficulty: 'Médio',
     category: 'Carnes',
     date: new Date(),
