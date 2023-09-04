@@ -1,5 +1,6 @@
 class Recipe {
     constructor(
+        public _id: string,
         public title: string,
         public ingredients: string[],
         public proceeds: string,

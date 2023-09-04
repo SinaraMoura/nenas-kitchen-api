@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { Article } from '../entities/Articles';
 import { ArticleRepository } from './ArticleRepositoty';
+import { v4 as uuidv4 } from 'uuid';
 
 const articleSchema = new mongoose.Schema({
     _id: {
@@ -21,6 +22,7 @@ const ArticleModel = mongoose.model('Articles', articleSchema);
 
 class ArticleRepositoryMongoose implements ArticleRepository {
     async addArticle(article: Article): Promise<Article> {
+        article._id = uuidv4()
         const articleModel = new ArticleModel(article);
 
         await articleModel.save();

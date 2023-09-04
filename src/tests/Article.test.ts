@@ -71,6 +71,7 @@ const articleRepository = {
 
 const articleUseCase = new ArticleUseCase(articleRepository)
 const article: Article = {
+    _id: '',
     title: 'Aprenda a refogar legumes e deixe suas receitas mais gostosas',
     description: "Método prático e rápido de preparar legumes, refogar é uma boa alternativa também porque não deixa o alimento perder seu valor nutricional. Mas como é exatamente o ato de refogar? Em poucas palavras, refogar é parecido com fritar, mas, nesse processo, o cozinheiro deve mexer incessantemente o alimento com um pouco de gordura – geralmente óleo ou azeite – até ganhar cor, textura e, principalmente, aroma. O cheiro de um refogado geralmente é aquele que faz inveja a toda a vizinhança.Quer aprender como refogar legumes e preparar pratos deliciosos em oito lições? Confira a seguir!",
     text: [

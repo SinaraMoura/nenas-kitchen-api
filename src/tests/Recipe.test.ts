@@ -199,6 +199,7 @@ const recipeRepository = {
 
 const recipeUseCase = new RecipeUseCase(recipeRepository)
 const recipe: Recipe = {
+    _id: '',
     title: 'Pernil Assado Com Hellmann’s',
     duration: '300 minutos',
     proceeds: '10 pessoas',

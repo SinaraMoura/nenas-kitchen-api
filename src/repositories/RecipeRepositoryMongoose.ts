@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { Recipe } from '../entities/Recipe';
 import { RecipeRepository } from './RecipeRepositoty';
-
+import { v4 as uuidv4 } from 'uuid';
 const recipeSchema = new mongoose.Schema({
     _id: {
         type: String,
@@ -26,6 +26,7 @@ const RecipeModel = mongoose.model('Recipe', recipeSchema);
 
 class RecipeRepositoryMongoose implements RecipeRepository {
     async addRecipe(recipe: Recipe): Promise<Recipe> {
+        recipe._id = uuidv4()
         const recipeModel = new RecipeModel(recipe);
 
         await recipeModel.save();
