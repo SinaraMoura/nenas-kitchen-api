@@ -9,6 +9,7 @@
     "test": "jest --forceExit",
     "dev": "tsx watch ./src/main.ts"
   },
+  "type": "module",
   "engines": {
     "node": "18.17.1"
   },
