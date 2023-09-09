@@ -1,14 +1,19 @@
 import cors from 'cors';
 import express, { Application } from 'express';
 import path from 'node:path';
+import { fileURLToPath } from 'url';
 import { connect } from './infra/database';
 import { errorMiddleware } from './middlewares/error.middlewares';
 import { RecipeRouter } from './routers/recipe.routers';
 import { ArticleRouter } from './routers/article.routers';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 class App {
     public app: Application;
     private recipeRoutes = new RecipeRouter();
     private articleRoutes = new ArticleRouter();
+
     constructor() {
         this.app = express();
         this.middlewaresInitialize();
