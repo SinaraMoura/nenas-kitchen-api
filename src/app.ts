@@ -35,7 +35,7 @@ class App {
         this.app.use(cors());
         this.app.use(
             '/uploads',
-            express.static(path.join(__dirname, 'tmp', 'uploads')),
+            express.static(path.join(__dirname, '..', 'tmp', 'uploads')),
         );
         this.app.use(express.urlencoded({ extended: true })); //text=Hello%20World
     }
