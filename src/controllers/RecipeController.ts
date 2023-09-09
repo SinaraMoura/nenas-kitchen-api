@@ -8,6 +8,7 @@ class RecipeController {
     async create(req: Request, res: Response, next: NextFunction) {
         let recipeData: Recipe = req.body;
         const files = req.files as any;
+        console.log("🚀 ~ file: RecipeController.ts:14 ~ RecipeController ~ create ~ files:", files)
 
         try {
             if (files) {
@@ -18,7 +19,6 @@ class RecipeController {
                     ...recipeData,
                     image: image.filename
                 };
-                console.log("🚀 ~ file: RecipeController.ts:17 ~ RecipeController ~ create ~ recipeData:", recipeData)
 
             }
             await this.recipeUseCase.create(recipeData);

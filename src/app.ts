@@ -9,6 +9,7 @@ import { ArticleRouter } from './routers/article.routers';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+console.log("🚀 ~ file: app.ts:12 ~ __dirname:", __dirname)
 
 class App {
     public app: Application;
@@ -34,7 +35,7 @@ class App {
         this.app.use(cors());
         this.app.use(
             '/uploads',
-            express.static(path.join(__dirname, './tmp/uploads')),
+            express.static(path.join(__dirname, 'tmp', 'uploads')),
         );
         this.app.use(express.urlencoded({ extended: true })); //text=Hello%20World
     }
