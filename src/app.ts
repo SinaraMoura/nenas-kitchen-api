@@ -9,6 +9,7 @@ import { ArticleRouter } from './routers/article.routers';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 class App {
     public app: Application;
     private recipeRoutes = new RecipeRouter();
