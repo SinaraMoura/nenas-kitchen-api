@@ -21,7 +21,6 @@ class ArticleController {
 
         try {
             await this.articleUseCase.create(articleData);
-            console.log("🚀 ~ file: ArticleController.ts:13 ~ ArticleController ~ create ~ articleData:", articleData)
             return res.status(201).json({ message: "Artigo adicionado com sucesso." })
         } catch (error) {
             next(error)

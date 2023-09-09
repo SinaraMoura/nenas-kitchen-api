@@ -2,11 +2,7 @@ import multer from 'multer';
 import crypto from 'node:crypto';
 import path from 'path';
 import fs from 'fs';
-// import { fileURLToPath } from 'url';
 
-// const __filename = fileURLToPath(import.meta.url);
-// console.log("🚀 ~ file: multer.ts:7 ~ __filename:", __filename)
-// const __dirname = path.dirname(__filename);
 const pathName = path.resolve(__dirname, 'tmp', 'uploads');
 if (!fs.existsSync(pathName)) {
     fs.mkdirSync(pathName, { recursive: true });
