@@ -9,17 +9,14 @@ class ArticleController {
         let articleData: Article = req.body;
         const files = req.files as any;
 
-        if (files) {
-            const image = files.image[0];
-
-
-            articleData = {
-                ...articleData,
-                image: image.filename
-            };
-        }
-
         try {
+            if (files) {
+                const image = files.image[0];
+                articleData = {
+                    ...articleData,
+                    image: image.filename
+                };
+            }
             await this.articleUseCase.create(articleData);
             return res.status(201).json({ message: "Artigo adicionado com sucesso." })
         } catch (error) {

@@ -12,13 +12,10 @@ class RecipeController {
         try {
             if (files) {
                 const image = files.image[0];
-
-
                 recipeData = {
                     ...recipeData,
                     image: image.filename
                 };
-
             }
             await this.recipeUseCase.create(recipeData);
             return res.status(201).json({ message: "Receita adicionada com sucesso." })
