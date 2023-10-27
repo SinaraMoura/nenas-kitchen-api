@@ -34,7 +34,7 @@ class RecipeController {
     }
 
     async findRecipesById(req: Request, res: Response, next: NextFunction) {
-        const { id } = req.params;
+        const { id } = req.query;
         try {
             const recipe = await this.recipeUseCase.findRecipesById(String(id));
             return res.status(200).json(recipe);

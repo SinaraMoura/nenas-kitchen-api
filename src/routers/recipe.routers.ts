@@ -35,7 +35,7 @@ class RecipeRouter {
             this.recipeController.findAllRecipes.bind(this.recipeController)
         );
         this.router.get(
-            '/id/:id',
+            '/id',
             this.recipeController.findRecipesById.bind(this.recipeController)
         )
         this.router.get(
