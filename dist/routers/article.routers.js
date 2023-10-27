@@ -43,16 +43,15 @@ var ArticleController = class {
   async create(req, res, next) {
     let articleData = req.body;
     const files = req.files;
-    if (files) {
-      const image = files.image[0];
-      articleData = {
-        ...articleData,
-        image: image.filename
-      };
-    }
     try {
+      if (files) {
+        const image = files.image[0];
+        articleData = {
+          ...articleData,
+          image: image.filename
+        };
+      }
       await this.articleUseCase.create(articleData);
-      console.log("\u{1F680} ~ file: ArticleController.ts:13 ~ ArticleController ~ create ~ articleData:", articleData);
       return res.status(201).json({ message: "Artigo adicionado com sucesso." });
     } catch (error) {
       next(error);
@@ -67,7 +66,7 @@ var ArticleController = class {
     }
   }
   async findArticlesById(req, res, next) {
-    const { id } = req.params;
+    const { id } = req.query;
     try {
       const article = await this.articleUseCase.findArticlesById(String(id));
       return res.status(200).json(article);
@@ -200,7 +199,7 @@ var ArticleRouter = class {
       this.articleController.findAllArticles.bind(this.articleController)
     );
     this.router.get(
-      "/id/:id",
+      "/id",
       this.articleController.findArticlesById.bind(this.articleController)
     );
   }

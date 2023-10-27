@@ -30,7 +30,6 @@ var RecipeController = class {
   async create(req, res, next) {
     let recipeData = req.body;
     const files = req.files;
-    console.log("\u{1F680} ~ file: RecipeController.ts:14 ~ RecipeController ~ create ~ files:", files);
     try {
       if (files) {
         const image = files.image[0];
@@ -54,7 +53,7 @@ var RecipeController = class {
     }
   }
   async findRecipesById(req, res, next) {
-    const { id } = req.params;
+    const { id } = req.query;
     try {
       const recipe = await this.recipeUseCase.findRecipesById(String(id));
       return res.status(200).json(recipe);

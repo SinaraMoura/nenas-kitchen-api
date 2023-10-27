@@ -69,7 +69,6 @@ var RecipeController = class {
   async create(req, res, next) {
     let recipeData = req.body;
     const files = req.files;
-    console.log("\u{1F680} ~ file: RecipeController.ts:14 ~ RecipeController ~ create ~ files:", files);
     try {
       if (files) {
         const image = files.image[0];
@@ -93,7 +92,7 @@ var RecipeController = class {
     }
   }
   async findRecipesById(req, res, next) {
-    const { id } = req.params;
+    const { id } = req.query;
     try {
       const recipe = await this.recipeUseCase.findRecipesById(String(id));
       return res.status(200).json(recipe);
@@ -348,7 +347,7 @@ var RecipeRouter = class {
       this.recipeController.findAllRecipes.bind(this.recipeController)
     );
     this.router.get(
-      "/id/:id",
+      "/id",
       this.recipeController.findRecipesById.bind(this.recipeController)
     );
     this.router.get(
@@ -385,16 +384,15 @@ var ArticleController = class {
   async create(req, res, next) {
     let articleData = req.body;
     const files = req.files;
-    if (files) {
-      const image = files.image[0];
-      articleData = {
-        ...articleData,
-        image: image.filename
-      };
-    }
     try {
+      if (files) {
+        const image = files.image[0];
+        articleData = {
+          ...articleData,
+          image: image.filename
+        };
+      }
       await this.articleUseCase.create(articleData);
-      console.log("\u{1F680} ~ file: ArticleController.ts:13 ~ ArticleController ~ create ~ articleData:", articleData);
       return res.status(201).json({ message: "Artigo adicionado com sucesso." });
     } catch (error) {
       next(error);
@@ -409,7 +407,7 @@ var ArticleController = class {
     }
   }
   async findArticlesById(req, res, next) {
-    const { id } = req.params;
+    const { id } = req.query;
     try {
       const article = await this.articleUseCase.findArticlesById(String(id));
       return res.status(200).json(article);
@@ -510,14 +508,13 @@ var ArticleRouter = class {
       this.articleController.findAllArticles.bind(this.articleController)
     );
     this.router.get(
-      "/id/:id",
+      "/id",
       this.articleController.findArticlesById.bind(this.articleController)
     );
   }
 };
 
 // src/app.ts
-console.log("\u{1F680} ~ file: app.ts:12 ~ __dirname:", __dirname);
 var App = class {
   constructor() {
     this.recipeRoutes = new RecipeRouter();
