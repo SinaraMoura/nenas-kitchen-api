@@ -1,21 +1,27 @@
 import { NextFunction, Request, Response } from 'express';
 import { Recipe } from '../entities/Recipe';
 import { RecipeUseCase } from '../useCase/RecipeUseCase';
-
+const { uploadFile } = require('../infra/storage.ts');
 class RecipeController {
     constructor(private recipeUseCase: RecipeUseCase) { }
 
     async create(req: Request, res: Response, next: NextFunction) {
         let recipeData: Recipe = req.body;
-        const files = req.files as any;
+        const file = req.file as any;
 
         try {
-            if (files) {
-                const image = files.image[0];
+            if (file) {
+                const arquivo = await uploadFile(
+                    `imagens/${file.originalname}`,
+                    file.buffer,
+                    file.mimetype
+                )
                 recipeData = {
                     ...recipeData,
-                    image: image.filename
+                    image: arquivo.url
                 };
+
+                console.log(recipeData);
             }
             await this.recipeUseCase.create(recipeData);
             return res.status(201).json({ message: "Receita adicionada com sucesso." })

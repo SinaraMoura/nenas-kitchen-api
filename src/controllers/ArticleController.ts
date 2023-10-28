@@ -1,20 +1,24 @@
 import { NextFunction, Request, Response } from 'express';
 import { Article } from '../entities/Articles';
 import { ArticleUseCase } from '../useCase/ArticleUseCase';
-
+const { uploadFile } = require('../infra/storage.ts');
 class ArticleController {
     constructor(private articleUseCase: ArticleUseCase) { }
 
     async create(req: Request, res: Response, next: NextFunction) {
         let articleData: Article = req.body;
-        const files = req.files as any;
+        const file = req.file as any;
 
         try {
-            if (files) {
-                const image = files.image[0];
+            if (file) {
+                const arquivo = await uploadFile(
+                    `imagens/${file.originalname}`,
+                    file.buffer,
+                    file.mimetype
+                )
                 articleData = {
                     ...articleData,
-                    image: image.filename
+                    image: arquivo.url
                 };
             }
             await this.articleUseCase.create(articleData);

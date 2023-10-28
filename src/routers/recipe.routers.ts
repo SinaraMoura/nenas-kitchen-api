@@ -2,8 +2,7 @@ import { Router } from "express";
 import { RecipeController } from "../controllers/RecipeController";
 import { RecipeRepositoryMongoose } from "../repositories/RecipeRepositoryMongoose";
 import { RecipeUseCase } from "../useCase/RecipeUseCase"
-import { upload } from "../infra/multer";
-
+import { upload } from '../infra/multer';
 class RecipeRouter {
     public router: Router;
     private recipeController: RecipeController;
@@ -17,17 +16,7 @@ class RecipeRouter {
     initRoutes() {
         this.router.post(
             '/',
-            upload.fields([
-                {
-                    name: 'image',
-                    maxCount: 1,
-                },
-
-            ]),
-            this.recipeController.create.bind(this.recipeController),
-        );
-        this.router.post(
-            '/',
+            upload.single('image'),
             this.recipeController.create.bind(this.recipeController)
         );
         this.router.get(
