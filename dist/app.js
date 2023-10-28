@@ -5,6 +5,9 @@ var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __commonJS = (cb, mod) => function __require() {
+  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+};
 var __export = (target, all) => {
   for (var name in all)
     __defProp(target, name, { get: all[name], enumerable: true });
@@ -26,6 +29,48 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   mod
 ));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// src/infra/storage.ts
+var require_storage = __commonJS({
+  "src/infra/storage.ts"(exports, module2) {
+    "use strict";
+    require("dotenv").config();
+    var aws = require("aws-sdk");
+    var endpoint = new aws.Endpoint(process.env.endpoint_s3);
+    var s3 = new aws.S3({
+      endpoint,
+      credentials: {
+        accessKeyId: process.env.id_key,
+        secretAccessKey: process.env.app_key
+      }
+    });
+    var uploadFile3 = async (path2, buffer, mimetype) => {
+      const arquivo = await s3.upload({
+        Bucket: process.env.bucket,
+        Key: path2,
+        Body: buffer,
+        ContentType: mimetype
+      }).promise();
+      return {
+        url: arquivo.Location,
+        path: arquivo.Key
+      };
+    };
+    var listFile = async () => {
+      const arquivos = await s3.listObjects({
+        Bucket: process.env.bucket
+      }).promise();
+      const files = arquivos.Contents.map((file) => {
+        return {
+          url: `https://${process.env.bucket}.${process.env.endpoint_s3}/${file.Key}`,
+          path: file.Key
+        };
+      });
+      return files;
+    };
+    module2.exports = { uploadFile: uploadFile3, listFile };
+  }
+});
 
 // src/app.ts
 var app_exports = {};
@@ -62,20 +107,26 @@ function errorMiddleware(err, req, res, next) {
 var import_express = require("express");
 
 // src/controllers/RecipeController.ts
+var { uploadFile } = require_storage();
 var RecipeController = class {
   constructor(recipeUseCase) {
     this.recipeUseCase = recipeUseCase;
   }
   async create(req, res, next) {
     let recipeData = req.body;
-    const files = req.files;
+    const file = req.file;
     try {
-      if (files) {
-        const image = files.image[0];
+      if (file) {
+        const arquivo = await uploadFile(
+          `imagens/${file.originalname}`,
+          file.buffer,
+          file.mimetype
+        );
         recipeData = {
           ...recipeData,
-          image: image.filename
+          image: arquivo.url
         };
+        console.log(recipeData);
       }
       await this.recipeUseCase.create(recipeData);
       return res.status(201).json({ message: "Receita adicionada com sucesso." });
@@ -297,26 +348,7 @@ var RecipeUseCase = class {
 
 // src/infra/multer.ts
 var import_multer = __toESM(require("multer"));
-var import_node_crypto = __toESM(require("crypto"));
-var import_path = __toESM(require("path"));
-var import_fs = __toESM(require("fs"));
-var pathName = import_path.default.resolve(__dirname, "tmp", "uploads");
-if (!import_fs.default.existsSync(pathName)) {
-  import_fs.default.mkdirSync(pathName, { recursive: true });
-}
-var upload = (0, import_multer.default)({
-  dest: pathName,
-  limits: { fileSize: 1024 * 1024 * 20 },
-  storage: import_multer.default.diskStorage({
-    destination(req, file, callback) {
-      callback(null, pathName);
-    },
-    filename(req, file, callback) {
-      const fileName = `${import_node_crypto.default.randomBytes(20).toString("hex")}${file.originalname}`;
-      callback(null, fileName);
-    }
-  })
-});
+var upload = (0, import_multer.default)({});
 
 // src/routers/recipe.routers.ts
 var RecipeRouter = class {
@@ -330,16 +362,7 @@ var RecipeRouter = class {
   initRoutes() {
     this.router.post(
       "/",
-      upload.fields([
-        {
-          name: "image",
-          maxCount: 1
-        }
-      ]),
-      this.recipeController.create.bind(this.recipeController)
-    );
-    this.router.post(
-      "/",
+      upload.single("image"),
       this.recipeController.create.bind(this.recipeController)
     );
     this.router.get(
@@ -377,19 +400,24 @@ var RecipeRouter = class {
 var import_express2 = require("express");
 
 // src/controllers/ArticleController.ts
+var { uploadFile: uploadFile2 } = require_storage();
 var ArticleController = class {
   constructor(articleUseCase) {
     this.articleUseCase = articleUseCase;
   }
   async create(req, res, next) {
     let articleData = req.body;
-    const files = req.files;
+    const file = req.file;
     try {
-      if (files) {
-        const image = files.image[0];
+      if (file) {
+        const arquivo = await uploadFile2(
+          `imagens/${file.originalname}`,
+          file.buffer,
+          file.mimetype
+        );
         articleData = {
           ...articleData,
-          image: image.filename
+          image: arquivo.url
         };
       }
       await this.articleUseCase.create(articleData);
@@ -491,16 +519,7 @@ var ArticleRouter = class {
   initRoutes() {
     this.router.post(
       "/",
-      upload.fields([
-        {
-          name: "image",
-          maxCount: 1
-        }
-      ]),
-      this.articleController.create.bind(this.articleController)
-    );
-    this.router.post(
-      "/",
+      upload.single("image"),
       this.articleController.create.bind(this.articleController)
     );
     this.router.get(

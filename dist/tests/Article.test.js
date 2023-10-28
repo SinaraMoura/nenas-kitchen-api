@@ -172,39 +172,65 @@ var require_implementation = __commonJS({
   "node_modules/function-bind/implementation.js"(exports, module2) {
     "use strict";
     var ERROR_MESSAGE = "Function.prototype.bind called on incompatible ";
-    var slice = Array.prototype.slice;
     var toStr = Object.prototype.toString;
+    var max = Math.max;
     var funcType = "[object Function]";
+    var concatty = function concatty2(a, b) {
+      var arr = [];
+      for (var i = 0; i < a.length; i += 1) {
+        arr[i] = a[i];
+      }
+      for (var j = 0; j < b.length; j += 1) {
+        arr[j + a.length] = b[j];
+      }
+      return arr;
+    };
+    var slicy = function slicy2(arrLike, offset) {
+      var arr = [];
+      for (var i = offset || 0, j = 0; i < arrLike.length; i += 1, j += 1) {
+        arr[j] = arrLike[i];
+      }
+      return arr;
+    };
+    var joiny = function(arr, joiner) {
+      var str = "";
+      for (var i = 0; i < arr.length; i += 1) {
+        str += arr[i];
+        if (i + 1 < arr.length) {
+          str += joiner;
+        }
+      }
+      return str;
+    };
     module2.exports = function bind(that) {
       var target = this;
-      if (typeof target !== "function" || toStr.call(target) !== funcType) {
+      if (typeof target !== "function" || toStr.apply(target) !== funcType) {
         throw new TypeError(ERROR_MESSAGE + target);
       }
-      var args = slice.call(arguments, 1);
+      var args = slicy(arguments, 1);
       var bound;
       var binder = function() {
         if (this instanceof bound) {
           var result = target.apply(
             this,
-            args.concat(slice.call(arguments))
+            concatty(args, arguments)
           );
           if (Object(result) === result) {
             return result;
           }
           return this;
-        } else {
-          return target.apply(
-            that,
-            args.concat(slice.call(arguments))
-          );
         }
+        return target.apply(
+          that,
+          concatty(args, arguments)
+        );
       };
-      var boundLength = Math.max(0, target.length - args.length);
+      var boundLength = max(0, target.length - args.length);
       var boundArgs = [];
       for (var i = 0; i < boundLength; i++) {
-        boundArgs.push("$" + i);
+        boundArgs[i] = "$" + i;
       }
-      bound = Function("binder", "return function (" + boundArgs.join(",") + "){ return binder.apply(this,arguments); }")(binder);
+      bound = Function("binder", "return function (" + joiny(boundArgs, ",") + "){ return binder.apply(this,arguments); }")(binder);
       if (target.prototype) {
         var Empty = function Empty2() {
         };
@@ -226,12 +252,14 @@ var require_function_bind = __commonJS({
   }
 });
 
-// node_modules/has/src/index.js
-var require_src = __commonJS({
-  "node_modules/has/src/index.js"(exports, module2) {
+// node_modules/hasown/index.js
+var require_hasown = __commonJS({
+  "node_modules/hasown/index.js"(exports, module2) {
     "use strict";
+    var call = Function.prototype.call;
+    var $hasOwn = Object.prototype.hasOwnProperty;
     var bind = require_function_bind();
-    module2.exports = bind.call(Function.call, Object.prototype.hasOwnProperty);
+    module2.exports = bind.call(call, $hasOwn);
   }
 });
 
@@ -433,7 +461,7 @@ var require_get_intrinsic = __commonJS({
       "%WeakSetPrototype%": ["WeakSet", "prototype"]
     };
     var bind = require_function_bind();
-    var hasOwn = require_src();
+    var hasOwn = require_hasown();
     var $concat = bind.call(Function.call, Array.prototype.concat);
     var $spliceApply = bind.call(Function.apply, Array.prototype.splice);
     var $replace = bind.call(Function.call, String.prototype.replace);
@@ -542,16 +570,163 @@ var require_get_intrinsic = __commonJS({
   }
 });
 
+// node_modules/has-property-descriptors/index.js
+var require_has_property_descriptors = __commonJS({
+  "node_modules/has-property-descriptors/index.js"(exports, module2) {
+    "use strict";
+    var GetIntrinsic = require_get_intrinsic();
+    var $defineProperty = GetIntrinsic("%Object.defineProperty%", true);
+    var hasPropertyDescriptors = function hasPropertyDescriptors2() {
+      if ($defineProperty) {
+        try {
+          $defineProperty({}, "a", { value: 1 });
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
+      return false;
+    };
+    hasPropertyDescriptors.hasArrayLengthDefineBug = function hasArrayLengthDefineBug() {
+      if (!hasPropertyDescriptors()) {
+        return null;
+      }
+      try {
+        return $defineProperty([], "length", { value: 1 }).length !== 1;
+      } catch (e) {
+        return true;
+      }
+    };
+    module2.exports = hasPropertyDescriptors;
+  }
+});
+
+// node_modules/gopd/index.js
+var require_gopd = __commonJS({
+  "node_modules/gopd/index.js"(exports, module2) {
+    "use strict";
+    var GetIntrinsic = require_get_intrinsic();
+    var $gOPD = GetIntrinsic("%Object.getOwnPropertyDescriptor%", true);
+    if ($gOPD) {
+      try {
+        $gOPD([], "length");
+      } catch (e) {
+        $gOPD = null;
+      }
+    }
+    module2.exports = $gOPD;
+  }
+});
+
+// node_modules/define-data-property/index.js
+var require_define_data_property = __commonJS({
+  "node_modules/define-data-property/index.js"(exports, module2) {
+    "use strict";
+    var hasPropertyDescriptors = require_has_property_descriptors()();
+    var GetIntrinsic = require_get_intrinsic();
+    var $defineProperty = hasPropertyDescriptors && GetIntrinsic("%Object.defineProperty%", true);
+    if ($defineProperty) {
+      try {
+        $defineProperty({}, "a", { value: 1 });
+      } catch (e) {
+        $defineProperty = false;
+      }
+    }
+    var $SyntaxError = GetIntrinsic("%SyntaxError%");
+    var $TypeError = GetIntrinsic("%TypeError%");
+    var gopd = require_gopd();
+    module2.exports = function defineDataProperty(obj, property, value) {
+      if (!obj || typeof obj !== "object" && typeof obj !== "function") {
+        throw new $TypeError("`obj` must be an object or a function`");
+      }
+      if (typeof property !== "string" && typeof property !== "symbol") {
+        throw new $TypeError("`property` must be a string or a symbol`");
+      }
+      if (arguments.length > 3 && typeof arguments[3] !== "boolean" && arguments[3] !== null) {
+        throw new $TypeError("`nonEnumerable`, if provided, must be a boolean or null");
+      }
+      if (arguments.length > 4 && typeof arguments[4] !== "boolean" && arguments[4] !== null) {
+        throw new $TypeError("`nonWritable`, if provided, must be a boolean or null");
+      }
+      if (arguments.length > 5 && typeof arguments[5] !== "boolean" && arguments[5] !== null) {
+        throw new $TypeError("`nonConfigurable`, if provided, must be a boolean or null");
+      }
+      if (arguments.length > 6 && typeof arguments[6] !== "boolean") {
+        throw new $TypeError("`loose`, if provided, must be a boolean");
+      }
+      var nonEnumerable = arguments.length > 3 ? arguments[3] : null;
+      var nonWritable = arguments.length > 4 ? arguments[4] : null;
+      var nonConfigurable = arguments.length > 5 ? arguments[5] : null;
+      var loose = arguments.length > 6 ? arguments[6] : false;
+      var desc = !!gopd && gopd(obj, property);
+      if ($defineProperty) {
+        $defineProperty(obj, property, {
+          configurable: nonConfigurable === null && desc ? desc.configurable : !nonConfigurable,
+          enumerable: nonEnumerable === null && desc ? desc.enumerable : !nonEnumerable,
+          value,
+          writable: nonWritable === null && desc ? desc.writable : !nonWritable
+        });
+      } else if (loose || !nonEnumerable && !nonWritable && !nonConfigurable) {
+        obj[property] = value;
+      } else {
+        throw new $SyntaxError("This environment does not support defining a property as non-configurable, non-writable, or non-enumerable.");
+      }
+    };
+  }
+});
+
+// node_modules/set-function-length/index.js
+var require_set_function_length = __commonJS({
+  "node_modules/set-function-length/index.js"(exports, module2) {
+    "use strict";
+    var GetIntrinsic = require_get_intrinsic();
+    var define = require_define_data_property();
+    var hasDescriptors = require_has_property_descriptors()();
+    var gOPD = require_gopd();
+    var $TypeError = GetIntrinsic("%TypeError%");
+    var $floor = GetIntrinsic("%Math.floor%");
+    module2.exports = function setFunctionLength(fn, length) {
+      if (typeof fn !== "function") {
+        throw new $TypeError("`fn` is not a function");
+      }
+      if (typeof length !== "number" || length < 0 || length > 4294967295 || $floor(length) !== length) {
+        throw new $TypeError("`length` must be a positive 32-bit integer");
+      }
+      var loose = arguments.length > 2 && !!arguments[2];
+      var functionLengthIsConfigurable = true;
+      var functionLengthIsWritable = true;
+      if ("length" in fn && gOPD) {
+        var desc = gOPD(fn, "length");
+        if (desc && !desc.configurable) {
+          functionLengthIsConfigurable = false;
+        }
+        if (desc && !desc.writable) {
+          functionLengthIsWritable = false;
+        }
+      }
+      if (functionLengthIsConfigurable || functionLengthIsWritable || !loose) {
+        if (hasDescriptors) {
+          define(fn, "length", length, true, true);
+        } else {
+          define(fn, "length", length);
+        }
+      }
+      return fn;
+    };
+  }
+});
+
 // node_modules/call-bind/index.js
 var require_call_bind = __commonJS({
   "node_modules/call-bind/index.js"(exports, module2) {
     "use strict";
     var bind = require_function_bind();
     var GetIntrinsic = require_get_intrinsic();
+    var setFunctionLength = require_set_function_length();
+    var $TypeError = GetIntrinsic("%TypeError%");
     var $apply = GetIntrinsic("%Function.prototype.apply%");
     var $call = GetIntrinsic("%Function.prototype.call%");
     var $reflectApply = GetIntrinsic("%Reflect.apply%", true) || bind.call($call, $apply);
-    var $gOPD = GetIntrinsic("%Object.getOwnPropertyDescriptor%", true);
     var $defineProperty = GetIntrinsic("%Object.defineProperty%", true);
     var $max = GetIntrinsic("%Math.max%");
     if ($defineProperty) {
@@ -562,18 +737,15 @@ var require_call_bind = __commonJS({
       }
     }
     module2.exports = function callBind(originalFunction) {
-      var func = $reflectApply(bind, $call, arguments);
-      if ($gOPD && $defineProperty) {
-        var desc = $gOPD(func, "length");
-        if (desc.configurable) {
-          $defineProperty(
-            func,
-            "length",
-            { value: 1 + $max(0, originalFunction.length - (arguments.length - 1)) }
-          );
-        }
+      if (typeof originalFunction !== "function") {
+        throw new $TypeError("a function is required");
       }
-      return func;
+      var func = $reflectApply(bind, $call, arguments);
+      return setFunctionLength(
+        func,
+        1 + $max(0, originalFunction.length - (arguments.length - 1)),
+        true
+      );
     };
     var applyBind = function applyBind2() {
       return $reflectApply(bind, $apply, arguments);
@@ -1969,11 +2141,11 @@ var require_Mime = __commonJS({
         }
       }
     };
-    Mime.prototype.getType = function(path3) {
-      path3 = String(path3);
-      let last = path3.replace(/^.*[/\\]/, "").toLowerCase();
+    Mime.prototype.getType = function(path2) {
+      path2 = String(path2);
+      let last = path2.replace(/^.*[/\\]/, "").toLowerCase();
       let ext = last.replace(/^.*\./, "").toLowerCase();
-      let hasPath = last.length < path3.length;
+      let hasPath = last.length < path2.length;
       let hasDot = ext.length < last.length - 1;
       return (hasDot || !hasPath) && this._types[ext] || null;
     };
@@ -10863,11 +11035,11 @@ var require_mime_types = __commonJS({
       }
       return exts[0];
     }
-    function lookup(path3) {
-      if (!path3 || typeof path3 !== "string") {
+    function lookup(path2) {
+      if (!path2 || typeof path2 !== "string") {
         return false;
       }
-      var extension2 = extname("x." + path3).toLowerCase().substr(1);
+      var extension2 = extname("x." + path2).toLowerCase().substr(1);
       if (!extension2) {
         return false;
       }
@@ -11136,11 +11308,11 @@ var require_form_data = __commonJS({
     "use strict";
     var CombinedStream = require_combined_stream();
     var util = require("util");
-    var path3 = require("path");
+    var path2 = require("path");
     var http = require("http");
     var https = require("https");
     var parseUrl = require("url").parse;
-    var fs2 = require("fs");
+    var fs = require("fs");
     var Stream = require("stream").Stream;
     var mime = require_mime_types();
     var asynckit = require_asynckit();
@@ -11205,7 +11377,7 @@ var require_form_data = __commonJS({
         if (value.end != void 0 && value.end != Infinity && value.start != void 0) {
           callback(null, value.end + 1 - (value.start ? value.start : 0));
         } else {
-          fs2.stat(value.path, function(err, stat) {
+          fs.stat(value.path, function(err, stat) {
             var fileSize;
             if (err) {
               callback(err);
@@ -11263,11 +11435,11 @@ var require_form_data = __commonJS({
     FormData.prototype._getContentDisposition = function(value, options) {
       var filename, contentDisposition;
       if (typeof options.filepath === "string") {
-        filename = path3.normalize(options.filepath).replace(/\\/g, "/");
+        filename = path2.normalize(options.filepath).replace(/\\/g, "/");
       } else if (options.filename || value.name || value.path) {
-        filename = path3.basename(options.filename || value.name || value.path);
+        filename = path2.basename(options.filename || value.name || value.path);
       } else if (value.readable && value.hasOwnProperty("httpVersion")) {
-        filename = path3.basename(value.client._httpMessage.path || "");
+        filename = path2.basename(value.client._httpMessage.path || "");
       }
       if (filename) {
         contentDisposition = 'filename="' + filename + '"';
@@ -11450,8 +11622,8 @@ var require_form_data = __commonJS({
 var require_PersistentFile = __commonJS({
   "node_modules/formidable/src/PersistentFile.js"(exports, module2) {
     "use strict";
-    var fs2 = require("fs");
-    var crypto2 = require("crypto");
+    var fs = require("fs");
+    var crypto = require("crypto");
     var { EventEmitter } = require("events");
     var PersistentFile = class extends EventEmitter {
       constructor({ filepath, newFilename, originalFilename, mimetype, hashAlgorithm }) {
@@ -11461,13 +11633,13 @@ var require_PersistentFile = __commonJS({
         this.size = 0;
         this._writeStream = null;
         if (typeof this.hashAlgorithm === "string") {
-          this.hash = crypto2.createHash(this.hashAlgorithm);
+          this.hash = crypto.createHash(this.hashAlgorithm);
         } else {
           this.hash = null;
         }
       }
       open() {
-        this._writeStream = new fs2.WriteStream(this.filepath);
+        this._writeStream = new fs.WriteStream(this.filepath);
         this._writeStream.on("error", (err) => {
           this.emit("error", err);
         });
@@ -11516,7 +11688,7 @@ var require_PersistentFile = __commonJS({
       }
       destroy() {
         this._writeStream.destroy();
-        fs2.unlink(this.filepath, () => {
+        fs.unlink(this.filepath, () => {
         });
       }
     };
@@ -11528,7 +11700,7 @@ var require_PersistentFile = __commonJS({
 var require_VolatileFile = __commonJS({
   "node_modules/formidable/src/VolatileFile.js"(exports, module2) {
     "use strict";
-    var crypto2 = require("crypto");
+    var crypto = require("crypto");
     var { EventEmitter } = require("events");
     var VolatileFile = class extends EventEmitter {
       constructor({ filepath, newFilename, originalFilename, mimetype, hashAlgorithm, createFileWriteStream }) {
@@ -11538,7 +11710,7 @@ var require_VolatileFile = __commonJS({
         this.size = 0;
         this._writeStream = null;
         if (typeof this.hashAlgorithm === "string") {
-          this.hash = crypto2.createHash(this.hashAlgorithm);
+          this.hash = crypto.createHash(this.hashAlgorithm);
         } else {
           this.hash = null;
         }
@@ -12900,7 +13072,7 @@ var require_Formidable = __commonJS({
   "node_modules/formidable/src/Formidable.js"(exports, module2) {
     "use strict";
     var os = require("os");
-    var path3 = require("path");
+    var path2 = require("path");
     var hexoid = (init_dist(), __toCommonJS(dist_exports));
     var once = require_once();
     var dezalgo = require_dezalgo();
@@ -12939,7 +13111,7 @@ var require_Formidable = __commonJS({
       constructor(options = {}) {
         super();
         this.options = { ...DEFAULT_OPTIONS, ...options };
-        const dir = path3.resolve(
+        const dir = path2.resolve(
           this.options.uploadDir || this.options.uploaddir || os.tmpdir()
         );
         this.uploaddir = dir;
@@ -12969,7 +13141,7 @@ var require_Formidable = __commonJS({
         }
         this.options.enabledPlugins.forEach((pluginName) => {
           const plgName = pluginName.toLowerCase();
-          this.use(require(path3.join(__dirname, "plugins", `${plgName}.js`)));
+          this.use(require(path2.join(__dirname, "plugins", `${plgName}.js`)));
         });
         this._setUpMaxFields();
       }
@@ -13309,19 +13481,19 @@ var require_Formidable = __commonJS({
         if (!str) {
           return "";
         }
-        const basename = path3.basename(str);
+        const basename = path2.basename(str);
         const firstDot = basename.indexOf(".");
         const lastDot = basename.lastIndexOf(".");
-        const extname = path3.extname(basename).replace(/(\.[a-z0-9]+).*/i, "$1");
+        const extname = path2.extname(basename).replace(/(\.[a-z0-9]+).*/i, "$1");
         if (firstDot === lastDot) {
           return extname;
         }
         return basename.slice(firstDot, lastDot) + extname;
       }
       _joinDirectoryName(name) {
-        const newPath = path3.join(this.uploadDir, name);
+        const newPath = path2.join(this.uploadDir, name);
         if (!newPath.startsWith(this.uploadDir)) {
-          return path3.join(this.uploadDir, this.options.defaultInvalidName);
+          return path2.join(this.uploadDir, this.options.defaultInvalidName);
         }
         return newPath;
       }
@@ -13332,7 +13504,7 @@ var require_Formidable = __commonJS({
             let ext = "";
             let name = this.options.defaultInvalidName;
             if (part.originalFilename) {
-              ({ ext, name } = path3.parse(part.originalFilename));
+              ({ ext, name } = path2.parse(part.originalFilename));
               if (this.options.keepExtensions !== true) {
                 ext = "";
               }
@@ -13761,7 +13933,7 @@ var require_parsers = __commonJS({
 });
 
 // node_modules/formidable/src/index.js
-var require_src2 = __commonJS({
+var require_src = __commonJS({
   "node_modules/formidable/src/index.js"(exports, module2) {
     "use strict";
     var PersistentFile = require_PersistentFile();
@@ -14536,7 +14708,7 @@ var require_node = __commonJS({
 });
 
 // node_modules/debug/src/index.js
-var require_src3 = __commonJS({
+var require_src2 = __commonJS({
   "node_modules/debug/src/index.js"(exports, module2) {
     "use strict";
     if (typeof process === "undefined" || process.type === "renderer" || process.browser === true || process.__nwjs) {
@@ -14553,15 +14725,15 @@ var require_cookiejar = __commonJS({
     "use strict";
     (function() {
       "use strict";
-      function CookieAccessInfo(domain, path3, secure, script) {
+      function CookieAccessInfo(domain, path2, secure, script) {
         if (this instanceof CookieAccessInfo) {
           this.domain = domain || void 0;
-          this.path = path3 || "/";
+          this.path = path2 || "/";
           this.secure = !!secure;
           this.script = !!script;
           return this;
         }
-        return new CookieAccessInfo(domain, path3, secure, script);
+        return new CookieAccessInfo(domain, path2, secure, script);
       }
       CookieAccessInfo.All = Object.freeze(/* @__PURE__ */ Object.create(null));
       exports.CookieAccessInfo = CookieAccessInfo;
@@ -18130,13 +18302,13 @@ var require_response = __commonJS({
     Response.prototype.toError = function() {
       const req = this.req;
       const method = req.method;
-      const path3 = req.path;
-      const message = `cannot ${method} ${path3} (${this.status})`;
+      const path2 = req.path;
+      const message = `cannot ${method} ${path2} (${this.status})`;
       const error = new Error(message);
       error.status = this.status;
       error.text = this.text;
       error.method = method;
-      error.path = path3;
+      error.path = path2;
       return error;
     };
     Response.prototype.setStatusProperties = function(status) {
@@ -18801,15 +18973,15 @@ var require_node2 = __commonJS({
     var Stream = require("stream");
     var https = require("https");
     var http = require("http");
-    var fs2 = require("fs");
+    var fs = require("fs");
     var zlib = require("zlib");
     var util = require("util");
     var qs = require_lib();
     var mime = require_mime();
     var methods = require_methods();
     var FormData = require_form_data();
-    var formidable = require_src2();
-    var debug = require_src3()("superagent");
+    var formidable = require_src();
+    var debug = require_src2()("superagent");
     var CookieJar = require_cookiejar();
     var semverGte = require_gte();
     var safeStringify = require_fast_safe_stringify();
@@ -18907,7 +19079,7 @@ var require_node2 = __commonJS({
           if (!o.filename)
             o.filename = file;
           debug("creating `fs.ReadStream` instance for file: %s", file);
-          file = fs2.createReadStream(file);
+          file = fs.createReadStream(file);
           file.on("error", (error) => {
             const formData = this._getFormData();
             formData.emit("error", error);
@@ -19587,13 +19759,13 @@ var require_test = __commonJS({
        * @param {String} path
        * @api public
        */
-      constructor(app2, method, path3) {
-        super(method.toUpperCase(), path3);
+      constructor(app2, method, path2) {
+        super(method.toUpperCase(), path2);
         this.redirects(0);
         this.buffer();
         this.app = app2;
         this._asserts = [];
-        this.url = typeof app2 === "string" ? app2 + path3 : this.serverAddress(app2, path3);
+        this.url = typeof app2 === "string" ? app2 + path2 : this.serverAddress(app2, path2);
       }
       /**
        * Returns a URL, extracted from a server.
@@ -19603,13 +19775,13 @@ var require_test = __commonJS({
        * @returns {String} URL address
        * @api private
        */
-      serverAddress(app2, path3) {
+      serverAddress(app2, path2) {
         const addr = app2.address();
         if (!addr)
           this._server = app2.listen(0);
         const port = app2.address().port;
         const protocol = app2 instanceof Server ? "https" : "http";
-        return protocol + "://127.0.0.1:" + port + path3;
+        return protocol + "://127.0.0.1:" + port + path2;
       }
       /**
        * Expectations:
@@ -19947,6 +20119,48 @@ var require_supertest = __commonJS({
   }
 });
 
+// src/infra/storage.ts
+var require_storage = __commonJS({
+  "src/infra/storage.ts"(exports, module2) {
+    "use strict";
+    require("dotenv").config();
+    var aws = require("aws-sdk");
+    var endpoint = new aws.Endpoint(process.env.endpoint_s3);
+    var s3 = new aws.S3({
+      endpoint,
+      credentials: {
+        accessKeyId: process.env.id_key,
+        secretAccessKey: process.env.app_key
+      }
+    });
+    var uploadFile3 = async (path2, buffer, mimetype) => {
+      const arquivo = await s3.upload({
+        Bucket: process.env.bucket,
+        Key: path2,
+        Body: buffer,
+        ContentType: mimetype
+      }).promise();
+      return {
+        url: arquivo.Location,
+        path: arquivo.Key
+      };
+    };
+    var listFile = async () => {
+      const arquivos = await s3.listObjects({
+        Bucket: process.env.bucket
+      }).promise();
+      const files = arquivos.Contents.map((file) => {
+        return {
+          url: `https://${process.env.bucket}.${process.env.endpoint_s3}/${file.Key}`,
+          path: file.Key
+        };
+      });
+      return files;
+    };
+    module2.exports = { uploadFile: uploadFile3, listFile };
+  }
+});
+
 // src/tests/Article.test.ts
 var import_supertest = __toESM(require_supertest());
 
@@ -19980,20 +20194,26 @@ function errorMiddleware(err, req, res, next) {
 var import_express = require("express");
 
 // src/controllers/RecipeController.ts
+var { uploadFile } = require_storage();
 var RecipeController = class {
   constructor(recipeUseCase) {
     this.recipeUseCase = recipeUseCase;
   }
   async create(req, res, next) {
     let recipeData = req.body;
-    const files = req.files;
+    const file = req.file;
     try {
-      if (files) {
-        const image = files.image[0];
+      if (file) {
+        const arquivo = await uploadFile(
+          `imagens/${file.originalname}`,
+          file.buffer,
+          file.mimetype
+        );
         recipeData = {
           ...recipeData,
-          image: image.filename
+          image: arquivo.url
         };
+        console.log(recipeData);
       }
       await this.recipeUseCase.create(recipeData);
       return res.status(201).json({ message: "Receita adicionada com sucesso." });
@@ -20215,26 +20435,7 @@ var RecipeUseCase = class {
 
 // src/infra/multer.ts
 var import_multer = __toESM(require("multer"));
-var import_node_crypto = __toESM(require("crypto"));
-var import_path = __toESM(require("path"));
-var import_fs = __toESM(require("fs"));
-var pathName = import_path.default.resolve(__dirname, "tmp", "uploads");
-if (!import_fs.default.existsSync(pathName)) {
-  import_fs.default.mkdirSync(pathName, { recursive: true });
-}
-var upload = (0, import_multer.default)({
-  dest: pathName,
-  limits: { fileSize: 1024 * 1024 * 20 },
-  storage: import_multer.default.diskStorage({
-    destination(req, file, callback) {
-      callback(null, pathName);
-    },
-    filename(req, file, callback) {
-      const fileName = `${import_node_crypto.default.randomBytes(20).toString("hex")}${file.originalname}`;
-      callback(null, fileName);
-    }
-  })
-});
+var upload = (0, import_multer.default)({});
 
 // src/routers/recipe.routers.ts
 var RecipeRouter = class {
@@ -20248,16 +20449,7 @@ var RecipeRouter = class {
   initRoutes() {
     this.router.post(
       "/",
-      upload.fields([
-        {
-          name: "image",
-          maxCount: 1
-        }
-      ]),
-      this.recipeController.create.bind(this.recipeController)
-    );
-    this.router.post(
-      "/",
+      upload.single("image"),
       this.recipeController.create.bind(this.recipeController)
     );
     this.router.get(
@@ -20295,19 +20487,24 @@ var RecipeRouter = class {
 var import_express2 = require("express");
 
 // src/controllers/ArticleController.ts
+var { uploadFile: uploadFile2 } = require_storage();
 var ArticleController = class {
   constructor(articleUseCase2) {
     this.articleUseCase = articleUseCase2;
   }
   async create(req, res, next) {
     let articleData = req.body;
-    const files = req.files;
+    const file = req.file;
     try {
-      if (files) {
-        const image = files.image[0];
+      if (file) {
+        const arquivo = await uploadFile2(
+          `imagens/${file.originalname}`,
+          file.buffer,
+          file.mimetype
+        );
         articleData = {
           ...articleData,
-          image: image.filename
+          image: arquivo.url
         };
       }
       await this.articleUseCase.create(articleData);
@@ -20409,16 +20606,7 @@ var ArticleRouter = class {
   initRoutes() {
     this.router.post(
       "/",
-      upload.fields([
-        {
-          name: "image",
-          maxCount: 1
-        }
-      ]),
-      this.articleController.create.bind(this.articleController)
-    );
-    this.router.post(
-      "/",
+      upload.single("image"),
       this.articleController.create.bind(this.articleController)
     );
     this.router.get(

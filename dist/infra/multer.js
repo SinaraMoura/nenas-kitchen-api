@@ -34,26 +34,7 @@ __export(multer_exports, {
 });
 module.exports = __toCommonJS(multer_exports);
 var import_multer = __toESM(require("multer"));
-var import_node_crypto = __toESM(require("crypto"));
-var import_path = __toESM(require("path"));
-var import_fs = __toESM(require("fs"));
-var pathName = import_path.default.resolve(__dirname, "tmp", "uploads");
-if (!import_fs.default.existsSync(pathName)) {
-  import_fs.default.mkdirSync(pathName, { recursive: true });
-}
-var upload = (0, import_multer.default)({
-  dest: pathName,
-  limits: { fileSize: 1024 * 1024 * 20 },
-  storage: import_multer.default.diskStorage({
-    destination(req, file, callback) {
-      callback(null, pathName);
-    },
-    filename(req, file, callback) {
-      const fileName = `${import_node_crypto.default.randomBytes(20).toString("hex")}${file.originalname}`;
-      callback(null, fileName);
-    }
-  })
-});
+var upload = (0, import_multer.default)({});
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   upload
