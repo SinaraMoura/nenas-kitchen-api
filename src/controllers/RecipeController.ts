@@ -20,8 +20,6 @@ class RecipeController {
                     ...recipeData,
                     image: arquivo.url
                 };
-
-                console.log(recipeData);
             }
             await this.recipeUseCase.create(recipeData);
             return res.status(201).json({ message: "Receita adicionada com sucesso." })
@@ -43,6 +41,8 @@ class RecipeController {
         const { id } = req.query;
         try {
             const recipe = await this.recipeUseCase.findRecipesById(String(id));
+            console.log(recipe);
+            
             return res.status(200).json(recipe);
         } catch (error) {
             next(error)
@@ -80,14 +80,28 @@ class RecipeController {
     }
 
     async updateRecipes(req: Request, res: Response, next: NextFunction) {
-        const { title, preparation } = req.body;
+        let recipeData: Recipe = req.body;
+        const file = req.file as any;
         const { id } = req.params;
+
         try {
-            const recipe = await this.recipeUseCase.updateRecipes(id, title, preparation);
-            return res.status(204).json(recipe);
+            if (file) {
+                const arquivo = await uploadFile(
+                    `imagens/${file.originalname}`,
+                    file.buffer,
+                    file.mimetype
+                )
+                recipeData = {
+                    ...recipeData,
+                    image: arquivo.url
+                };
+            }
+            await this.recipeUseCase.updateRecipes(id,recipeData);
+            return res.status(204).json({ message: "Receita atualizada com sucesso." })
         } catch (error) {
             next(error)
         }
+        
     }
 
     async deleteRecipes(req: Request, res: Response, next: NextFunction) {

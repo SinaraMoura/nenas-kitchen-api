@@ -41,6 +41,7 @@ class RecipeRouter {
         )
         this.router.put(
             '/update/:id',
+            upload.single('image'),
             this.recipeController.updateRecipes.bind(this.recipeController)
         )
         this.router.delete(

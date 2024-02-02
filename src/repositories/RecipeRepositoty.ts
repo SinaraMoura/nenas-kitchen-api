@@ -7,6 +7,6 @@ export interface RecipeRepository {
     findRecipesByCategory(category: string): Promise<Recipe[]>
     findRecipesByName(name: string): Promise<Recipe[]>
     findRecipesByDifficulty(name: string): Promise<Recipe[]>
-    updateRecipes(title: string, preparation: string[]): Promise<any>
+    updateRecipes(id: string, recipe: Recipe): Promise<Recipe | undefined>
     deleteRecipes(id: string): Promise<any>
 }
