@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsup src/**/*.ts --out-dir dist",
+    "build": "tsup src --out-dir dist",
     "start": "node ./dist/main.js",
     "test": "jest --forceExit",
     "dev": "tsx watch ./src/main.ts"
@@ -12,7 +12,7 @@
   "engines": {
     "node": "18.17.1"
   },
-  "keywords": [],
+  "keywords": [ ],
   "author": "",
   "license": "ISC",
   "dependencies": {
