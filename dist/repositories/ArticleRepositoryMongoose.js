@@ -65,6 +65,14 @@ var ArticleRepositoryMongoose = class {
     const findArticle = await ArticleModel.findById({ _id: id }).exec();
     return findArticle ? findArticle.toObject() : void 0;
   }
+  async deleteArticle(id) {
+    const deleteArticle = await ArticleModel.deleteOne({ _id: id }).exec();
+    return deleteArticle;
+  }
+  async updateArticle(id, article) {
+    const updateArticle = await ArticleModel.findOneAndUpdate({ _id: id }, article, { new: true }).exec();
+    return updateArticle ? updateArticle.toObject() : void 0;
+  }
 };
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

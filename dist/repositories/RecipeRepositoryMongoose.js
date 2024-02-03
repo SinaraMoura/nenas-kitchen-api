@@ -92,9 +92,9 @@ var RecipeRepositoryMongoose = class {
     }).exec();
     return findRecipe.map((recipe) => recipe.toObject());
   }
-  async updateRecipes(title, preparation) {
-    const updateRecipe = await RecipeModel.updateOne({ title, preparation }).exec();
-    return updateRecipe;
+  async updateRecipes(id, recipe) {
+    const updateRecipe = await RecipeModel.findOneAndUpdate({ _id: id }, recipe, { new: true }).exec();
+    return updateRecipe ? updateRecipe.toObject() : void 0;
   }
   async deleteRecipes(id) {
     const deleteRecipe = await RecipeModel.deleteOne({ _id: id }).exec();

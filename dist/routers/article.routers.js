@@ -124,6 +124,37 @@ var ArticleController = class {
       next(error);
     }
   }
+  async deleteArticle(req, res, next) {
+    const { id } = req.params;
+    try {
+      const article = await this.articleUseCase.deleteArticle(id);
+      return res.status(200).json(article);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async updateArticle(req, res, next) {
+    let articleData = req.body;
+    const file = req.file;
+    const { id } = req.params;
+    try {
+      if (file) {
+        const arquivo = await uploadFile(
+          `imagens/${file.originalname}`,
+          file.buffer,
+          file.mimetype
+        );
+        articleData = {
+          ...articleData,
+          image: arquivo.url
+        };
+      }
+      await this.articleUseCase.updateArticle(id, articleData);
+      return res.status(204).json({ message: "Artigo atualizado com sucesso." });
+    } catch (error) {
+      next(error);
+    }
+  }
 };
 
 // src/repositories/ArticleRepositoryMongoose.ts
@@ -158,6 +189,14 @@ var ArticleRepositoryMongoose = class {
   async findArticlesById(id) {
     const findArticle = await ArticleModel.findById({ _id: id }).exec();
     return findArticle ? findArticle.toObject() : void 0;
+  }
+  async deleteArticle(id) {
+    const deleteArticle = await ArticleModel.deleteOne({ _id: id }).exec();
+    return deleteArticle;
+  }
+  async updateArticle(id, article) {
+    const updateArticle = await ArticleModel.findOneAndUpdate({ _id: id }, article, { new: true }).exec();
+    return updateArticle ? updateArticle.toObject() : void 0;
   }
 };
 
@@ -195,6 +234,19 @@ var ArticleUseCase = class {
     const result = await this.articleRepository.findArticlesById(id);
     return result;
   }
+  async deleteArticle(id) {
+    if (!id)
+      throw new HttpException(400, "Id is required");
+    const result = await this.articleRepository.deleteArticle(id);
+    return result;
+  }
+  async updateArticle(id, recipeData) {
+    const recipe = await this.articleRepository.findArticlesById(id);
+    if (!recipe)
+      throw new HttpException(400, "Article not found");
+    const result = await this.articleRepository.updateArticle(id, recipeData);
+    return result;
+  }
 };
 
 // src/infra/multer.ts
@@ -223,6 +275,15 @@ var ArticleRouter = class {
     this.router.get(
       "/id",
       this.articleController.findArticlesById.bind(this.articleController)
+    );
+    this.router.delete(
+      "/delete/:id",
+      this.articleController.deleteArticle.bind(this.articleController)
+    );
+    this.router.put(
+      "/update/:id",
+      upload.single("image"),
+      this.articleController.updateArticle.bind(this.articleController)
     );
   }
 };

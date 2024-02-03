@@ -20213,7 +20213,6 @@ var RecipeController = class {
           ...recipeData,
           image: arquivo.url
         };
-        console.log(recipeData);
       }
       await this.recipeUseCase.create(recipeData);
       return res.status(201).json({ message: "Receita adicionada com sucesso." });
@@ -20247,6 +20246,20 @@ var RecipeController = class {
       next(error);
     }
   }
+  async findAllRecipesByCategory(req, res, next) {
+    try {
+      const recipes = await this.recipeUseCase.findAllRecipes();
+      const categoriesSet = new Set(recipes.map((recipe2) => recipe2.category));
+      const categoriesArray = Array.from(categoriesSet);
+      const categorizedRecipes = categoriesArray.map((category) => ({
+        category,
+        recipes: recipes.filter((recipe2) => recipe2.category === category)
+      }));
+      return res.status(200).json(categorizedRecipes);
+    } catch (error) {
+      next(error);
+    }
+  }
   async findRecipesByName(req, res, next) {
     const { name } = req.query;
     try {
@@ -20266,11 +20279,23 @@ var RecipeController = class {
     }
   }
   async updateRecipes(req, res, next) {
-    const { title, preparation } = req.body;
+    let recipeData = req.body;
+    const file = req.file;
     const { id } = req.params;
     try {
-      const recipe2 = await this.recipeUseCase.updateRecipes(id, title, preparation);
-      return res.status(204).json(recipe2);
+      if (file) {
+        const arquivo = await uploadFile(
+          `imagens/${file.originalname}`,
+          file.buffer,
+          file.mimetype
+        );
+        recipeData = {
+          ...recipeData,
+          image: arquivo.url
+        };
+      }
+      await this.recipeUseCase.updateRecipes(id, recipeData);
+      return res.status(204).json({ message: "Receita atualizada com sucesso." });
     } catch (error) {
       next(error);
     }
@@ -20346,9 +20371,9 @@ var RecipeRepositoryMongoose = class {
     }).exec();
     return findRecipe.map((recipe2) => recipe2.toObject());
   }
-  async updateRecipes(title, preparation) {
-    const updateRecipe = await RecipeModel.updateOne({ title, preparation }).exec();
-    return updateRecipe;
+  async updateRecipes(id, recipe2) {
+    const updateRecipe = await RecipeModel.findOneAndUpdate({ _id: id }, recipe2, { new: true }).exec();
+    return updateRecipe ? updateRecipe.toObject() : void 0;
   }
   async deleteRecipes(id) {
     const deleteRecipe = await RecipeModel.deleteOne({ _id: id }).exec();
@@ -20417,11 +20442,11 @@ var RecipeUseCase = class {
     const result = await this.recipeRepository.findRecipesByDifficulty(name);
     return result;
   }
-  async updateRecipes(id, title, preparation) {
+  async updateRecipes(id, recipeData) {
     const recipe2 = await this.recipeRepository.findRecipesById(id);
     if (!recipe2)
       throw new HttpException(400, "Recipe not found");
-    const result = await this.recipeRepository.updateRecipes(title, preparation);
+    const result = await this.recipeRepository.updateRecipes(id, recipeData);
     return result;
   }
   async deleteRecipes(id) {
@@ -20465,6 +20490,10 @@ var RecipeRouter = class {
       this.recipeController.findRecipesByCategory.bind(this.recipeController)
     );
     this.router.get(
+      "/category",
+      this.recipeController.findAllRecipesByCategory.bind(this.recipeController)
+    );
+    this.router.get(
       "/title",
       this.recipeController.findRecipesByName.bind(this.recipeController)
     );
@@ -20474,6 +20503,7 @@ var RecipeRouter = class {
     );
     this.router.put(
       "/update/:id",
+      upload.single("image"),
       this.recipeController.updateRecipes.bind(this.recipeController)
     );
     this.router.delete(
@@ -20530,6 +20560,37 @@ var ArticleController = class {
       next(error);
     }
   }
+  async deleteArticle(req, res, next) {
+    const { id } = req.params;
+    try {
+      const article = await this.articleUseCase.deleteArticle(id);
+      return res.status(200).json(article);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async updateArticle(req, res, next) {
+    let articleData = req.body;
+    const file = req.file;
+    const { id } = req.params;
+    try {
+      if (file) {
+        const arquivo = await uploadFile2(
+          `imagens/${file.originalname}`,
+          file.buffer,
+          file.mimetype
+        );
+        articleData = {
+          ...articleData,
+          image: arquivo.url
+        };
+      }
+      await this.articleUseCase.updateArticle(id, articleData);
+      return res.status(204).json({ message: "Artigo atualizado com sucesso." });
+    } catch (error) {
+      next(error);
+    }
+  }
 };
 
 // src/repositories/ArticleRepositoryMongoose.ts
@@ -20565,6 +20626,14 @@ var ArticleRepositoryMongoose = class {
     const findArticle = await ArticleModel.findById({ _id: id }).exec();
     return findArticle ? findArticle.toObject() : void 0;
   }
+  async deleteArticle(id) {
+    const deleteArticle = await ArticleModel.deleteOne({ _id: id }).exec();
+    return deleteArticle;
+  }
+  async updateArticle(id, article) {
+    const updateArticle = await ArticleModel.findOneAndUpdate({ _id: id }, article, { new: true }).exec();
+    return updateArticle ? updateArticle.toObject() : void 0;
+  }
 };
 
 // src/useCase/ArticleUseCase.ts
@@ -20592,6 +20661,19 @@ var ArticleUseCase = class {
     const result = await this.articleRepository.findArticlesById(id);
     return result;
   }
+  async deleteArticle(id) {
+    if (!id)
+      throw new HttpException(400, "Id is required");
+    const result = await this.articleRepository.deleteArticle(id);
+    return result;
+  }
+  async updateArticle(id, recipeData) {
+    const recipe2 = await this.articleRepository.findArticlesById(id);
+    if (!recipe2)
+      throw new HttpException(400, "Article not found");
+    const result = await this.articleRepository.updateArticle(id, recipeData);
+    return result;
+  }
 };
 
 // src/routers/article.routers.ts
@@ -20616,6 +20698,15 @@ var ArticleRouter = class {
     this.router.get(
       "/id",
       this.articleController.findArticlesById.bind(this.articleController)
+    );
+    this.router.delete(
+      "/delete/:id",
+      this.articleController.deleteArticle.bind(this.articleController)
+    );
+    this.router.put(
+      "/update/:id",
+      upload.single("image"),
+      this.articleController.updateArticle.bind(this.articleController)
     );
   }
 };

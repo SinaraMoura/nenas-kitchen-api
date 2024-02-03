@@ -58,6 +58,19 @@ var ArticleUseCase = class {
     const result = await this.articleRepository.findArticlesById(id);
     return result;
   }
+  async deleteArticle(id) {
+    if (!id)
+      throw new HttpException(400, "Id is required");
+    const result = await this.articleRepository.deleteArticle(id);
+    return result;
+  }
+  async updateArticle(id, recipeData) {
+    const recipe = await this.articleRepository.findArticlesById(id);
+    if (!recipe)
+      throw new HttpException(400, "Article not found");
+    const result = await this.articleRepository.updateArticle(id, recipeData);
+    return result;
+  }
 };
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

@@ -111,6 +111,37 @@ var ArticleController = class {
       next(error);
     }
   }
+  async deleteArticle(req, res, next) {
+    const { id } = req.params;
+    try {
+      const article = await this.articleUseCase.deleteArticle(id);
+      return res.status(200).json(article);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async updateArticle(req, res, next) {
+    let articleData = req.body;
+    const file = req.file;
+    const { id } = req.params;
+    try {
+      if (file) {
+        const arquivo = await uploadFile(
+          `imagens/${file.originalname}`,
+          file.buffer,
+          file.mimetype
+        );
+        articleData = {
+          ...articleData,
+          image: arquivo.url
+        };
+      }
+      await this.articleUseCase.updateArticle(id, articleData);
+      return res.status(204).json({ message: "Artigo atualizado com sucesso." });
+    } catch (error) {
+      next(error);
+    }
+  }
 };
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

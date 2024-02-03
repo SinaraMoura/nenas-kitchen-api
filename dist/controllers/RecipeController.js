@@ -87,7 +87,6 @@ var RecipeController = class {
           ...recipeData,
           image: arquivo.url
         };
-        console.log(recipeData);
       }
       await this.recipeUseCase.create(recipeData);
       return res.status(201).json({ message: "Receita adicionada com sucesso." });
@@ -121,6 +120,20 @@ var RecipeController = class {
       next(error);
     }
   }
+  async findAllRecipesByCategory(req, res, next) {
+    try {
+      const recipes = await this.recipeUseCase.findAllRecipes();
+      const categoriesSet = new Set(recipes.map((recipe) => recipe.category));
+      const categoriesArray = Array.from(categoriesSet);
+      const categorizedRecipes = categoriesArray.map((category) => ({
+        category,
+        recipes: recipes.filter((recipe) => recipe.category === category)
+      }));
+      return res.status(200).json(categorizedRecipes);
+    } catch (error) {
+      next(error);
+    }
+  }
   async findRecipesByName(req, res, next) {
     const { name } = req.query;
     try {
@@ -140,11 +153,23 @@ var RecipeController = class {
     }
   }
   async updateRecipes(req, res, next) {
-    const { title, preparation } = req.body;
+    let recipeData = req.body;
+    const file = req.file;
     const { id } = req.params;
     try {
-      const recipe = await this.recipeUseCase.updateRecipes(id, title, preparation);
-      return res.status(204).json(recipe);
+      if (file) {
+        const arquivo = await uploadFile(
+          `imagens/${file.originalname}`,
+          file.buffer,
+          file.mimetype
+        );
+        recipeData = {
+          ...recipeData,
+          image: arquivo.url
+        };
+      }
+      await this.recipeUseCase.updateRecipes(id, recipeData);
+      return res.status(204).json({ message: "Receita atualizada com sucesso." });
     } catch (error) {
       next(error);
     }
