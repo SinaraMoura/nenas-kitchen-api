@@ -58,6 +58,24 @@ class RecipeController {
         }
     }
 
+    async findAllRecipesByCategory(req: Request, res: Response, next: NextFunction) {
+        try {
+            const recipes = await this.recipeUseCase.findAllRecipes(); 
+            const categoriesSet = new Set(recipes.map((recipe: any) => recipe.category));
+            const categoriesArray = Array.from(categoriesSet);
+        
+            const categorizedRecipes = categoriesArray.map((category: string) => ({
+              category,
+              recipes: recipes.filter((recipe: any) => recipe.category === category),
+            }));
+        
+            return res.status(200).json(categorizedRecipes);
+          } catch (error) {
+            next(error);
+          }
+      }
+      
+
     async findRecipesByName(req: Request, res: Response, next: NextFunction) {
         const { name } = req.query;
         try {
