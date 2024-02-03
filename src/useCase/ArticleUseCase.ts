@@ -35,5 +35,13 @@ class ArticleUseCase {
         return result;
     }
 
+    async updateArticle(id: string, recipeData: Article) {
+        const recipe = await this.articleRepository.findArticlesById(id);
+        if (!recipe) throw new HttpException(400, 'Article not found');
+
+        const result = await this.articleRepository.updateArticle(id, recipeData);
+        return result;
+    }
+
 }
 export { ArticleUseCase }

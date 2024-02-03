@@ -56,5 +56,30 @@ class ArticleController {
             next(error)
         }
     }
+
+    async updateArticle(req: Request, res: Response, next: NextFunction) {
+        let articleData: Article = req.body;
+        const file = req.file as any;
+        const { id } = req.params;
+
+        try {
+            if (file) {
+                const arquivo = await uploadFile(
+                    `imagens/${file.originalname}`,
+                    file.buffer,
+                    file.mimetype
+                )
+                articleData = {
+                    ...articleData,
+                    image: arquivo.url
+                };
+            }
+            await this.articleUseCase.updateArticle(id,articleData);
+            return res.status(204).json({ message: "Artigo atualizado com sucesso." })
+        } catch (error) {
+            next(error)
+        }
+        
+    }
 }
 export { ArticleController }

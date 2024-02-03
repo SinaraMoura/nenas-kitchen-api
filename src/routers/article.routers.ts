@@ -32,6 +32,12 @@ class ArticleRouter {
             '/delete/:id',
             this.articleController.deleteArticle.bind(this.articleController)
         )
+
+        this.router.put(
+            '/update/:id',
+            upload.single('image'),
+            this.articleController.updateArticle.bind(this.articleController)
+        )
     }
 }
 

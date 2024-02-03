@@ -41,7 +41,6 @@ class RecipeController {
         const { id } = req.query;
         try {
             const recipe = await this.recipeUseCase.findRecipesById(String(id));
-            console.log(recipe);
             
             return res.status(200).json(recipe);
         } catch (error) {
