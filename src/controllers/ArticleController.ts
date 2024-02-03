@@ -46,5 +46,15 @@ class ArticleController {
             next(error)
         }
     }
+
+    async deleteArticle(req: Request, res: Response, next: NextFunction) {
+        const { id } = req.params;
+        try {
+            const article = await this.articleUseCase.deleteArticle(id);
+            return res.status(200).json(article);
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 export { ArticleController }

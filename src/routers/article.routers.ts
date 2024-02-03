@@ -28,6 +28,10 @@ class ArticleRouter {
             '/id',
             this.articleController.findArticlesById.bind(this.articleController)
         );
+        this.router.delete(
+            '/delete/:id',
+            this.articleController.deleteArticle.bind(this.articleController)
+        )
     }
 }
 

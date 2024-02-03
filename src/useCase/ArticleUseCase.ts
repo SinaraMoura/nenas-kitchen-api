@@ -28,5 +28,12 @@ class ArticleUseCase {
         const result = await this.articleRepository.findArticlesById(id);
         return result;
     }
+
+    async deleteArticle(id: string) {
+        if (!id) throw new HttpException(400, 'Id is required');
+        const result = await this.articleRepository.deleteArticle(id);
+        return result;
+    }
+
 }
 export { ArticleUseCase }

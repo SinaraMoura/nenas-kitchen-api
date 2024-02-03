@@ -37,6 +37,11 @@ class ArticleRepositoryMongoose implements ArticleRepository {
         const findArticle = await ArticleModel.findById({ _id: id }).exec();
         return findArticle ? findArticle.toObject() : undefined
     }
+
+    async deleteArticle(id: string): Promise<any> {
+        const deleteArticle = await ArticleModel.deleteOne({ _id: id }).exec();
+        return deleteArticle;
+    }
 }
 export { ArticleRepositoryMongoose };
 

@@ -4,4 +4,5 @@ export interface ArticleRepository {
     addArticle(article: Article): Promise<Article>
     findAllArticle(): Promise<Article[]>
     findArticlesById(id: string): Promise<Article | undefined>
+    deleteArticle(id:string): Promise<any>
 }
